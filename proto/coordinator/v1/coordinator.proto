@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package coordinator;
+
+import "proto/shared/v1/shared.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+message CoordinatorConfig {
+    int64 count = 1;
+    string algo = 2;
+    google.protobuf.Duration heartbeat_interval = 3;
+}
+
+message GrantedCoordinator {
+    string id = 1;
+    string role = 2;
+    string queue_name = 3;
+    google.protobuf.Timestamp created_at = 4;
+}

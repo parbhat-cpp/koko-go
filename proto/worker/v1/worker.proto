@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package worker;
+
+import "proto/shared/v1/shared.proto";
+import "google/protobuf/timestamp.proto";
+
+message WorkerConfig {
+    int64 count = 1;
+    string queue_name = 3;
+}
+
+message GrantedWorker {
+    string id = 1;
+    repeated int64 segments = 2;
+    string queue_name = 3;
+    google.protobuf.Timestamp created_at = 4;
+}

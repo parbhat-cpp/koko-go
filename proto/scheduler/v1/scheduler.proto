@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package scheduler;
+
+import "proto/worker/v1/worker.proto";
+import "proto/job/v1/job.proto";
+import "proto/coordinator/v1/coordinator.proto";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+
+message RegisterRequest {
+  string                        topic              = 1;
+  worker.WorkerConfig           worker_config      = 2;
+  coordinator.CoordinatorConfig coordinator_config = 3;
+}
+
+enum ResourceKind {
+  RESOURCE_KIND_UNSPECIFIED = 0;
+  RESOURCE_KIND_WORKER      = 1;
+  RESOURCE_KIND_COORDINATOR = 2;
+}
+
+message Notice {
+  string       code      = 1;
+  string       message   = 2;
+  ResourceKind resource  = 3;
+  int64        requested = 4;
+  int64        granted   = 5;
+}
+
+message RegisterResponse {
+  repeated worker.GrantedWorker           granted_workers      = 1;
+  repeated coordinator.GrantedCoordinator granted_coordinators = 2;
+  repeated Notice                         notices              = 3;
+  bool                                    final                = 4;
+}
+
+message AddJobRequest {
+  string  topic = 1;
+  job.Job job   = 2;
+}
+
+message RemoveJobRequest {
+  string topic  = 1;
+  string job_id = 2;
+}
+
+message AddRemoveJobResponse {
+  string job_id          = 1;
+  string topic           = 2;
+  string success_message = 3;
+}
+
+message ViewStatusRequest {
+  string topic = 1;
+}
+
+message ViewStatusResponse {
+  repeated worker.GrantedWorker           granted_workers      = 1;
+  repeated coordinator.GrantedCoordinator granted_coordinators = 2;
+  repeated Notice                         notices              = 3;
+  int64                                   total_jobs           = 4;
+  int64                                   remaining_jobs       = 5;
+  int64                                   completed_jobs       = 6;
+  int64                                   failed_jobs          = 7;
+}
+
+service Scheduler {
+  rpc Register(RegisterRequest) returns (stream RegisterResponse);
+  rpc AddJob(AddJobRequest) returns (AddRemoveJobResponse);
+  rpc RemoveJob(RemoveJobRequest) returns (AddRemoveJobResponse);
+  rpc ViewStatus(ViewStatusRequest) returns (ViewStatusResponse);
+}

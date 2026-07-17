@@ -74,6 +74,3 @@ func (s *Scheduler) Remove(ctx context.Context, topic string, jobID string) erro
 
 func (s *Scheduler) ViewStatus(ctx context.Context, topic string) {
 }
-
-func (s *Scheduler) ViewLogs(ctx context.Context, topic string, jobID string) {
-}
