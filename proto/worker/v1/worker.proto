@@ -1,15 +1,17 @@
 syntax = "proto3";
 
-package worker;
+package worker.v1;
 
 import "proto/shared/v1/shared.proto";
 import "google/protobuf/timestamp.proto";
 
+// WorkerConfig message defines the configuration for a worker, including the count of workers and the queue name they are associated with.
 message WorkerConfig {
     int64 count = 1;
     string queue_name = 3;
 }
 
+// GrantedWorker message represents a worker that has been granted resources by the scheduler, including its ID, assigned segments, queue name, and the timestamp of when it was created.
 message GrantedWorker {
     string id = 1;
     repeated int64 segments = 2;
