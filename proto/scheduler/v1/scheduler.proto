@@ -2,71 +2,75 @@ syntax = "proto3";
 
 package scheduler.v1;
 
-import "proto/worker/v1/worker.proto";
-import "proto/job/v1/job.proto";
-import "proto/coordinator/v1/coordinator.proto";
-
-import "google/protobuf/timestamp.proto";
-import "google/protobuf/any.proto";
+import "coordinator/v1/coordinator.proto";
+import "job/v1/job.proto";
+import "worker/v1/worker.proto";
 
 // Scheduler service for managing job scheduling and resource allocation.
-message SchedulerInitRequest {
-  string name           = 1;
+message SchedulerServiceInitRequest {
+  string name = 1;
   string connection_url = 2;
 }
 
-// Response message for the SchedulerInitRequest, indicating whether the initialization was successful.
-message SchedulerInitResponse {
+// Response message for the SchedulerServiceInitRequest, indicating whether the initialization was successful.
+message SchedulerServiceInitResponse {
   bool success = 1;
 }
 
 // Request message for registering a worker or coordinator with the scheduler, including the topic and configuration details.
 message RegisterRequest {
-  string                        topic              = 1;
-  worker.v1.WorkerConfig           worker_config      = 2;
+  string topic = 1;
+  worker.v1.WorkerConfig worker_config = 2;
   coordinator.v1.CoordinatorConfig coordinator_config = 3;
 }
 
 // Response message for the RegisterRequest, containing granted resources, notices, and a flag indicating if the registration is final.
 enum ResourceKind {
   RESOURCE_KIND_UNSPECIFIED = 0;
-  RESOURCE_KIND_WORKER      = 1;
+  RESOURCE_KIND_WORKER = 1;
   RESOURCE_KIND_COORDINATOR = 2;
 }
 
 // Notice message provides information about resource allocation, including the code, message, resource kind, and the number of requested and granted resources.
 message Notice {
-  string       code      = 1;
-  string       message   = 2;
-  ResourceKind resource  = 3;
-  int64        requested = 4;
-  int64        granted   = 5;
+  string code = 1;
+  string message = 2;
+  ResourceKind resource = 3;
+  int64 requested = 4;
+  int64 granted = 5;
 }
 
 // Response message for the RegisterRequest, containing granted workers, granted coordinators, notices, and a flag indicating if the registration is final.
 message RegisterResponse {
-  repeated worker.v1.GrantedWorker           granted_workers      = 1;
+  repeated worker.v1.GrantedWorker granted_workers = 1;
   repeated coordinator.v1.GrantedCoordinator granted_coordinators = 2;
-  repeated Notice                         notices              = 3;
-  bool                                    final                = 4;
+  repeated Notice notices = 3;
+  bool final = 4;
 }
 
 // Request message for adding a job to the scheduler, including the topic and job details.
 message AddJobRequest {
-  string  topic = 1;
-  job.v1.Job job   = 2;
+  string topic = 1;
+  job.v1.Job job = 2;
 }
 
 // Response message for adding or removing a job, containing the job ID, topic, and a success message.
 message RemoveJobRequest {
-  string topic  = 1;
+  string topic = 1;
   string job_id = 2;
 }
 
-// Response message for adding or removing a job, containing the job ID, topic, and a success message.
-message AddRemoveJobResponse {
-  string job_id          = 1;
-  string topic           = 2;
+// Response message for adding a job, containing the job ID, topic, and a success message.
+message AddJobResponse {
+  string job_id = 1;
+  string topic = 2;
+  string success_message = 3;
+}
+
+// Response message for removing a job, containing the job ID, topic, and a success message.
+message RemoveJobResponse {
+  string job_id = 1;
+  string topic = 2;
   string success_message = 3;
 }
 
@@ -77,27 +81,27 @@ message ViewStatusRequest {
 
 // Response message for viewing the status of the scheduler, containing granted workers, granted coordinators, notices, and job statistics such as total jobs, remaining jobs, completed jobs, and failed jobs.
 message ViewStatusResponse {
-  repeated worker.v1.GrantedWorker           granted_workers      = 1;
+  repeated worker.v1.GrantedWorker granted_workers = 1;
   repeated coordinator.v1.GrantedCoordinator granted_coordinators = 2;
-  repeated Notice                         notices              = 3;
-  int64                                   total_jobs           = 4;
-  int64                                   remaining_jobs       = 5;
-  int64                                   completed_jobs       = 6;
-  int64                                   failed_jobs          = 7;
+  repeated Notice notices = 3;
+  int64 total_jobs = 4;
+  int64 remaining_jobs = 5;
+  int64 completed_jobs = 6;
+  int64 failed_jobs = 7;
 }
 
 /**
  * Scheduler service for managing job scheduling and resource allocation.
  */
-service Scheduler {
+service SchedulerService {
   // Initializes the scheduler with the provided configuration.
-  rpc Init(SchedulerInitRequest) returns (SchedulerInitResponse);
+  rpc Init(SchedulerServiceInitRequest) returns (SchedulerServiceInitResponse);
   // Registers a worker or coordinator and streams updates about granted resources and notices.
   rpc Register(RegisterRequest) returns (stream RegisterResponse);
   // Adds a job to the specified topic.
-  rpc AddJob(AddJobRequest) returns (AddRemoveJobResponse);
+  rpc AddJob(AddJobRequest) returns (AddJobResponse);
   // Removes a job from the specified topic.
-  rpc RemoveJob(RemoveJobRequest) returns (AddRemoveJobResponse);
+  rpc RemoveJob(RemoveJobRequest) returns (RemoveJobResponse);
   // Views the status of the specified topic, including granted resources and job statistics.
   rpc ViewStatus(ViewStatusRequest) returns (ViewStatusResponse);
 }

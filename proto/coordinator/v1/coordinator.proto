@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package coordinator.v1;
 
-import "proto/shared/v1/shared.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 

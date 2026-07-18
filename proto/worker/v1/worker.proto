@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package worker.v1;
 
-import "proto/shared/v1/shared.proto";
 import "google/protobuf/timestamp.proto";
 
 // WorkerConfig message defines the configuration for a worker, including the count of workers and the queue name they are associated with.
