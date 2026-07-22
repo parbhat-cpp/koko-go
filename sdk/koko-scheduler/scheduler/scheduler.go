@@ -2,12 +2,19 @@ package scheduler
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/parbhat-cpp/koko-go/sdk/koko-scheduler/coordinator"
 	"github.com/parbhat-cpp/koko-go/sdk/koko-scheduler/job"
 	"github.com/parbhat-cpp/koko-go/sdk/koko-scheduler/queue"
+	"github.com/parbhat-cpp/koko-go/sdk/koko-scheduler/utils"
 	"github.com/parbhat-cpp/koko-go/sdk/koko-scheduler/worker"
 	"github.com/redis/go-redis/v9"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	pb "github.com/parbhat-cpp/koko-go/proto/gen/scheduler/v1"
+	sharedv1 "github.com/parbhat-cpp/koko-go/proto/gen/shared/v1"
 )
 
 type RegisterUpdate struct {
@@ -27,16 +34,51 @@ type Notice struct {
 type Config struct {
 	Name        string
 	RedisConfig redis.Options
+	ConnUrl     string
 }
 
 type Scheduler struct {
-	cfg Config
+	cfg    Config
+	conn   *grpc.ClientConn
+	client pb.SchedulerServiceClient
 }
 
 func New(cfg Config) (*Scheduler, error) {
+	conn, err := grpc.NewClient(cfg.ConnUrl, grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	if err != nil {
+		return nil, err
+	}
+	client := pb.NewSchedulerServiceClient(conn)
+
+	res, err := client.Init(context.Background(), &pb.SchedulerServiceInitRequest{
+		Name:        &sharedv1.ServiceName{Name: cfg.Name},
+		RedisConfig: utils.ToSchedulerRedisOptions(&cfg.RedisConfig),
+	})
+
+	if err != nil {
+		_ = conn.Close()
+		return nil, err
+	}
+
+	if !res.Success {
+		_ = conn.Close()
+		return nil, fmt.Errorf("scheduler init failed for %s", cfg.Name)
+	}
+
 	return &Scheduler{
-		cfg: cfg,
+		cfg:    cfg,
+		conn:   conn,
+		client: client,
 	}, nil
+}
+
+func (s *Scheduler) Close() error {
+	if s.conn == nil {
+		return nil
+	}
+
+	return s.conn.Close()
 }
 
 func (s *Scheduler) registerRequest(ctx context.Context, cfg queue.Config) (<-chan RegisterUpdate, error) {

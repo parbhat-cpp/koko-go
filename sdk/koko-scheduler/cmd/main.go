@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/parbhat-cpp/koko-go/sdk/koko-scheduler/job"
@@ -17,7 +18,12 @@ func main() {
 		RedisConfig: redis.Options{
 			Addr: "localhost:6379",
 		},
+		ConnUrl: "127.0.0.1:50051",
 	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	q, err := s.Register(context.Background(), queue.Config{
 		Topic: "email:service",
@@ -32,7 +38,7 @@ func main() {
 	}, nil)
 
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	j := job.New(map[string]any{
