@@ -8,7 +8,7 @@ import "job/v1/job.proto";
 import "shared/v1/shared.proto";
 import "worker/v1/worker.proto";
 
-option go_package = "github.com/parbhat-cpp/koko-go/proto/scheduler/v1;schedulerv1";
+option go_package = "github.com/parbhat-cpp/koko-go/proto/gen/scheduler/v1;schedulerv1";
 
 // RedisOptions for internal use in the scheduler service, including connection details and timeouts.
 message RedisOptions {
@@ -27,14 +27,14 @@ message RedisOptions {
 
 // Scheduler service for managing job scheduling and resource allocation.
 message SchedulerServiceInitRequest {
-  string name = 1;
+  shared.v1.ServiceName name = 1;
   RedisOptions redis_config = 2;
 }
 
 // Response message for the SchedulerServiceInitRequest, indicating whether the initialization was successful.
 message SchedulerServiceInitResponse {
   bool success = 1;
-  string name = 2;
+  shared.v1.ServiceName name = 2;
 }
 
 // Request message for registering a worker or coordinator with the scheduler, including the topic and configuration details.
@@ -70,33 +70,33 @@ message RegisterResponse {
 
 // Request message for adding a job to the scheduler, including the topic and job details.
 message AddJobRequest {
-  string topic = 1;
+  shared.v1.ServiceName topic = 1;
   job.v1.Job job = 2;
 }
 
 // Response message for adding or removing a job, containing the job ID, topic, and a success message.
 message RemoveJobRequest {
-  string topic = 1;
+  shared.v1.ServiceName topic = 1;
   string job_id = 2;
 }
 
 // Response message for adding a job, containing the job ID, topic, and a success message.
 message AddJobResponse {
   string job_id = 1;
-  string topic = 2;
+  shared.v1.ServiceName topic = 2;
   string success_message = 3;
 }
 
 // Response message for removing a job, containing the job ID, topic, and a success message.
 message RemoveJobResponse {
   string job_id = 1;
-  string topic = 2;
+  shared.v1.ServiceName topic = 2;
   string success_message = 3;
 }
 
 // Request message for viewing the status of the scheduler, including the topic for which the status is requested.
 message ViewStatusRequest {
-  string topic = 1;
+  shared.v1.ServiceName topic = 1;
 }
 
 // Response message for viewing the status of the scheduler, containing granted workers, granted coordinators, notices, and job statistics such as total jobs, remaining jobs, completed jobs, and failed jobs.

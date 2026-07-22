@@ -2,4 +2,14 @@ syntax = "proto3";
 
 package shared.v1;
 
-option go_package = "github.com/parbhat-cpp/koko-go/proto/shared/v1;sharedv1";
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/parbhat-cpp/koko-go/proto/gen/shared/v1;sharedv1";
+
+message ServiceName {
+  string name = 1 [
+    (buf.validate.field).string.min_len = 4,
+    (buf.validate.field).string.max_len = 20,
+    (buf.validate.field).string.pattern = "^[a-z:_]+$"
+  ];
+}
