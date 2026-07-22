@@ -5,10 +5,12 @@ package job.v1;
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "github.com/parbhat-cpp/koko-go/proto/gen/job/v1;jobv1";
+
 // Job message represents a job with an ID, maximum number of tries, payload data, and the scheduled run time.
 message Job {
-    string id = 1;
-    int64 max_tries = 2;
-    google.protobuf.Struct payload = 3;
-    google.protobuf.Timestamp run_at = 4;
+  string id = 1;
+  int64 max_tries = 2;
+  google.protobuf.Struct payload = 3;
+  google.protobuf.Timestamp run_at = 4;
 }

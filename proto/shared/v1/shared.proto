@@ -1,3 +1,5 @@
 syntax = "proto3";
 
 package shared.v1;
+
+option go_package = "github.com/parbhat-cpp/koko-go/proto/shared/v1;sharedv1";

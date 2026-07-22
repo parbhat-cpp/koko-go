@@ -3,18 +3,38 @@ syntax = "proto3";
 package scheduler.v1;
 
 import "coordinator/v1/coordinator.proto";
+import "google/protobuf/duration.proto";
 import "job/v1/job.proto";
+import "shared/v1/shared.proto";
 import "worker/v1/worker.proto";
+
+option go_package = "github.com/parbhat-cpp/koko-go/proto/scheduler/v1;schedulerv1";
+
+// RedisOptions for internal use in the scheduler service, including connection details and timeouts.
+message RedisOptions {
+  string addr = 1;
+  string username = 2;
+  string password = 3;
+  int32 db = 4;
+  int32 max_retries = 5;
+
+  google.protobuf.Duration dial_timeout = 6;
+  google.protobuf.Duration read_timeout = 7;
+  google.protobuf.Duration write_timeout = 8;
+
+  int32 pool_size = 9;
+}
 
 // Scheduler service for managing job scheduling and resource allocation.
 message SchedulerServiceInitRequest {
   string name = 1;
-  string connection_url = 2;
+  RedisOptions redis_config = 2;
 }
 
 // Response message for the SchedulerServiceInitRequest, indicating whether the initialization was successful.
 message SchedulerServiceInitResponse {
   bool success = 1;
+  string name = 2;
 }
 
 // Request message for registering a worker or coordinator with the scheduler, including the topic and configuration details.
