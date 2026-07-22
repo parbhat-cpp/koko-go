@@ -8,12 +8,15 @@ import (
 	"github.com/parbhat-cpp/koko-go/sdk/koko-scheduler/queue"
 	"github.com/parbhat-cpp/koko-go/sdk/koko-scheduler/scheduler"
 	"github.com/parbhat-cpp/koko-go/sdk/koko-scheduler/worker"
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
 	s, err := scheduler.New(scheduler.Config{
-		Name:          "Koko",
-		ConnectionUrl: "redis://localhost:6379",
+		Name: "Koko",
+		RedisConfig: redis.Options{
+			Addr: "localhost:6379",
+		},
 	})
 
 	q, err := s.Register(context.Background(), queue.Config{

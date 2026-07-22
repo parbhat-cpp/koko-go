@@ -7,6 +7,7 @@ import (
 	"github.com/parbhat-cpp/koko-go/sdk/koko-scheduler/job"
 	"github.com/parbhat-cpp/koko-go/sdk/koko-scheduler/queue"
 	"github.com/parbhat-cpp/koko-go/sdk/koko-scheduler/worker"
+	"github.com/redis/go-redis/v9"
 )
 
 type RegisterUpdate struct {
@@ -24,8 +25,8 @@ type Notice struct {
 }
 
 type Config struct {
-	Name          string
-	ConnectionUrl string
+	Name        string
+	RedisConfig redis.Options
 }
 
 type Scheduler struct {
